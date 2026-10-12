@@ -8,6 +8,22 @@ the model's answer, and OpenRouter's full JSON reply (tokens and cost included).
 
 ## Run it
 
+### Measure screen
+
+Install the front-end dependencies and start the React app:
+
+```bash
+npm install
+npm run dev
+```
+
+The Explain an Office page uses the shared OpenRouter setup for its explainer and illustration
+buttons. Configure `js/config.local.js` as described below to enable generation.
+
+The existing standalone API examples are still available under `examples/`.
+
+### API examples
+
 1. Copy `js/config.local.example.js` to `js/config.local.js` and paste your OpenRouter key in.
    Keep your key private: don't share or hand in `js/config.local.js`.
 2. Serve the folder (browsers block `fetch()` from `file://`):
@@ -32,5 +48,3 @@ the model's answer, and OpenRouter's full JSON reply (tokens and cost included).
 | `examples/06-image.*` | Generate an image from a text prompt (`POST /api/v1/images`). About $0.04 per image. |
 | `data/datapack.json` | The ballot measures. Each has `label` (e.g. `"Prop 4"`) and `fullText`, the legal text; words in `[DELETED: ...]` are being removed from the law. `official` holds the state's own summary: show it to people, but don't send it to the model. |
 | `pack.offices` (in `datapack.json`) | The five offices on the ballot, from the PROG 02 handout. Not used by these examples yet. |
-
-
