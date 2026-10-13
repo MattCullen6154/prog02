@@ -1,6 +1,6 @@
 const sections = [
   { id: 'measures', label: 'Understand a Measure' },
-  { id: 'compare', label: 'Compare Both Sides', disabled: true },
+  { id: 'compare', label: 'Compare Both Sides' },
   { id: 'offices', label: 'Explain an Office' },
 ];
 

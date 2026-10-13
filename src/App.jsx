@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import CompareBothSides from './components/CompareBothSides.jsx';
 import MeasureDetail from './components/MeasureDetail.jsx';
 import MeasureList from './components/MeasureList.jsx';
 import OfficeDetail from './components/OfficeDetail.jsx';
@@ -18,6 +19,8 @@ export default function App() {
         ? `${selectedMeasure.label} | Prog 02: Represent!`
       : activeSection === 'offices'
         ? 'Explain an Office | Prog 02: Represent!'
+        : activeSection === 'compare'
+          ? 'Compare Both Sides | Prog 02: Represent!'
         : 'Understand a Measure | Prog 02: Represent!';
   }, [activeSection, selectedMeasure, selectedOffice]);
 
@@ -39,6 +42,8 @@ export default function App() {
           />
           {activeSection === 'offices' ? (
             <OfficePage onSelect={setSelectedOffice} />
+          ) : activeSection === 'compare' ? (
+            <CompareBothSides onSelect={setSelectedMeasure} />
           ) : (
             <main className="ml-[8.4vw] w-[80.3vw] max-w-[1156px] pb-8 max-[700px]:ml-0 max-[700px]:w-auto max-[700px]:px-5">
               <header className="pt-[2px] max-[1200px]:pt-3">
