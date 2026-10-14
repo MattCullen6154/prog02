@@ -1,4 +1,5 @@
 import datapack from '../../data/datapack.json';
+import { useEffect, useState } from 'react';
 import OfficeList from './OfficeList.jsx';
 
 function OfficePageHeader() {
@@ -23,10 +24,40 @@ function OfficePageHeader() {
 }
 
 export default function OfficePage({ onSelect }) {
+  const [offices, setOffices] = useState(null);
+  const [loadError, setLoadError] = useState(null);
+
+  useEffect(() => {
+    let isCurrent = true;
+    import('../../data/datapack.json')
+      .then(({ default: datapack }) => {
+        if (isCurrent) setOffices(datapack.offices);
+      })
+      .catch((error) => {
+        if (isCurrent) {
+          setLoadError(error instanceof Error ? error.message : 'Unable to load offices.');
+        }
+      });
+
+    return () => {
+      isCurrent = false;
+    };
+  }, []);
+
   return (
     <main className="mx-auto w-[80.3vw] max-w-[1156px] pb-8 max-[700px]:w-auto max-[700px]:px-5">
       <OfficePageHeader />
-      <OfficeList offices={datapack.offices} onSelect={onSelect} />
+      {loadError ? (
+        <p role="alert" className="font-sans text-sm text-red-800">
+          Could not load offices: {loadError}
+        </p>
+      ) : offices ? (
+        <OfficeList offices={offices} onSelect={onSelect} />
+      ) : (
+        <p role="status" className="font-sans text-sm">
+          Loading offices…
+        </p>
+      )}
     </main>
   );
 }

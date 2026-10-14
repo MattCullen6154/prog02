@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import CompareMeasureDetail from './components/CompareMeasureDetail.jsx';
 import CompareBothSides from './components/CompareBothSides.jsx';
 import MeasureDetail from './components/MeasureDetail.jsx';
 import MeasureList from './components/MeasureList.jsx';
@@ -16,7 +17,7 @@ export default function App() {
     document.title = selectedOffice
       ? `${selectedOffice.name} | Prog 02: Represent!`
       : selectedMeasure
-        ? `${selectedMeasure.label} | Prog 02: Represent!`
+        ? `${selectedMeasure.label}${activeSection === 'compare' ? ' — Compare Both Sides' : ''} | Prog 02: Represent!`
       : activeSection === 'offices'
         ? 'Explain an Office | Prog 02: Represent!'
         : activeSection === 'compare'
@@ -33,7 +34,14 @@ export default function App() {
           onClose={() => setSelectedOffice(null)}
         />
       ) : selectedMeasure ? (
-        <MeasureDetail measure={selectedMeasure} onClose={() => setSelectedMeasure(null)} />
+        activeSection === 'compare' ? (
+          <CompareMeasureDetail
+            measure={selectedMeasure}
+            onClose={() => setSelectedMeasure(null)}
+          />
+        ) : (
+          <MeasureDetail measure={selectedMeasure} onClose={() => setSelectedMeasure(null)} />
+        )
       ) : (
         <>
           <PrimaryNavigation
