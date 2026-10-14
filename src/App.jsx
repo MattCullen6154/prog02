@@ -45,7 +45,7 @@ export default function App() {
           ) : activeSection === 'compare' ? (
             <CompareBothSides onSelect={setSelectedMeasure} />
           ) : (
-            <main className="ml-[8.4vw] w-[80.3vw] max-w-[1156px] pb-8 max-[700px]:ml-0 max-[700px]:w-auto max-[700px]:px-5">
+            <main className="mx-auto w-[80.3vw] max-w-[1156px] pb-8 max-[700px]:w-auto max-[700px]:px-5">
               <header className="pt-[2px] max-[1200px]:pt-3">
                 <h1 className="text-center font-sans text-[clamp(1.55rem,2.5vw,2.25rem)] font-semibold leading-tight">
                   Understand the ballot, understand the issues

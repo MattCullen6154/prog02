@@ -3,7 +3,7 @@ import MeasureList from './MeasureList.jsx';
 
 export default function CompareBothSides({ onSelect }) {
   return (
-    <main className="ml-[8.4vw] w-[80.3vw] max-w-[1156px] pb-8 max-[700px]:ml-0 max-[700px]:w-auto max-[700px]:px-5">
+    <main className="mx-auto w-[80.3vw] max-w-[1156px] pb-8 max-[700px]:w-auto max-[700px]:px-5">
       <MeasureHeader>
         <span className="block max-[700px]:inline">
           Below are 4 real measures from the 2026 California ballot. Pick one and see common arguments{' '}

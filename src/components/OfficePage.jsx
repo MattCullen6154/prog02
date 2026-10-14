@@ -24,7 +24,7 @@ function OfficePageHeader() {
 
 export default function OfficePage({ onSelect }) {
   return (
-    <main className="ml-[8.4vw] w-[80.3vw] max-w-[1156px] pb-8 max-[700px]:ml-0 max-[700px]:w-auto max-[700px]:px-5">
+    <main className="mx-auto w-[80.3vw] max-w-[1156px] pb-8 max-[700px]:w-auto max-[700px]:px-5">
       <OfficePageHeader />
       <OfficeList offices={datapack.offices} onSelect={onSelect} />
     </main>

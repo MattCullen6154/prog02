@@ -8,7 +8,7 @@ export default function PrimaryNavigation({ activeSection, onSectionChange }) {
   return (
     <nav
       aria-label="Main sections"
-      className="flex min-h-[clamp(38px,3.75vw,54px)] items-stretch gap-1 border-b border-black/70 px-[6.3%] max-[700px]:overflow-x-auto max-[700px]:px-3"
+      className="flex min-h-[clamp(38px,3.75vw,54px)] items-stretch justify-center gap-1 border-b border-black/70 px-3 max-[700px]:justify-start max-[700px]:overflow-x-auto"
     >
       {sections.map((section) => (
         <button
