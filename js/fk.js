@@ -44,3 +44,5 @@ function fleschKincaid(text) {
 function operativeText(fullText) {
   return fullText.replace(/\[DELETED: [^\]]*\]/g, ' ').replace(/[ \t]+/g, ' ');
 }
+
+globalThis.prog02Readability = { fleschKincaid, operativeText };
