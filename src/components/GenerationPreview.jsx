@@ -32,6 +32,7 @@ export default function GenerationPreview({
   length,
   onGenerate,
   isGenerating,
+  generationProgress,
   hasGenerated,
   error,
 }) {
@@ -56,7 +57,11 @@ export default function GenerationPreview({
           disabled={isGenerating}
           className="mt-[clamp(14px,1.39vw,20px)] inline-flex min-h-[clamp(48px,4.45vw,64px)] items-center bg-[#dfaaaa] px-[clamp(16px,1.25vw,18px)] font-sans text-[clamp(1.06rem,1.67vw,1.5rem)] leading-none hover:bg-[#d99a9a] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black disabled:cursor-wait disabled:opacity-70"
         >
-          {isGenerating ? 'Generating…' : hasGenerated ? 'Generate again' : 'Generate this version'}
+          {isGenerating
+            ? generationProgress || 'Generating…'
+            : hasGenerated
+              ? 'Generate again'
+              : 'Generate this version'}
         </button>
       ) : (
         <a

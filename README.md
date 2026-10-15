@@ -70,6 +70,20 @@ These hand-selected terms intentionally favor a simple, explainable first signal
 legal interpretation. Synonyms and contextual references can be missed, and some matches may be
 incidental. A high count does not mean the measure improves or harms that issue. Selecting **Explain**
 is a separate, explicit action: only then is an AI request made, using short source excerpts around
-that issue's keyword matches. The generated rewrite's reading level is also measured locally with
-`js/fk.js` (Flesch–Kincaid) and shown against the requested grade range; this readability score is an
+that issue's keyword matches. The explanation separates a neutral description of what the text says
+from a clearly labeled AI opinion about likely effects, including its favorable/unfavorable leaning,
+supporting and opposing points, and uncertainties. The opinion is interpretation, not a fact or legal
+conclusion. The generated rewrite's reading level is also measured locally with `js/fk.js`
+(Flesch–Kincaid) and shown against the requested grade range; this readability score is an
 approximation, not a guarantee of comprehension.
+
+The generated rewrite and issue explanation ask the AI to provide exact source quotes alongside each
+summary statement and supported opinion point. A citation link is shown only when its quoted wording
+can be matched in the operative legal text; clicking it opens that text with the passage highlighted.
+This makes the cited wording checkable, but does not guarantee the AI's interpretation is correct.
+
+After a generated rewrite passes its selected Flesch–Kincaid grade range, a separate AI request
+compares it with the complete operative measure and lists important qualifiers that appear preserved,
+partly preserved, or not visible in the rewrite. If the rewrite does not reach the requested grade
+range after retries, this audit is skipped. The qualifier scan is an aid for spotting possible
+omissions, not a legal completeness guarantee; users should check the original text.

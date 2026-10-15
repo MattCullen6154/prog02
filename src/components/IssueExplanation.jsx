@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import { getTopicEvidence } from '../utils/topicKeywords.js';
-import { getModelText } from '../utils/modelResponse.js';
+import { parseTopicExplanation } from '../utils/topicExplanation.js';
+import SourceCitation from './SourceCitation.jsx';
+import TopicOpinion from './TopicOpinion.jsx';
 
 export default function IssueExplanation({ measure, sourceText, topic }) {
   const [attempt, setAttempt] = useState(0);
-  const [result, setResult] = useState({ status: 'loading', text: '' });
+  const [result, setResult] = useState({ status: 'loading', explanation: null, text: '' });
 
   useEffect(() => {
     let current = true;
@@ -21,16 +23,35 @@ export default function IssueExplanation({ measure, sourceText, topic }) {
     }
 
     setResult({ status: 'loading', text: '' });
-    const prompt = `Explain how the legal text below relates to "${topic.label}" for ${measure.label}. Use only the provided excerpts, summarize relevant provisions in 2–4 concise sentences, and do not infer effects not stated in the text. If the connection is not direct, say so. Do not give an opinion or introduce outside facts.\n\n${excerpts
+    const prompt = `Analyze how ${measure.label} relates to "${topic.label}" using only the legal excerpts below. Return only a valid JSON object with this exact shape:
+{
+  "textSays": [
+    {
+      "text": "One neutral, factual summary sentence describing what the law says about this topic. Do not infer effects or include an opinion.",
+      "sourceQuote": "An exact, contiguous quote copied from the legal excerpts that supports this sentence."
+    }
+  ],
+  "opinion": {
+    "leaning": "strongly_favorable | favorable | slightly_favorable | mixed | slightly_unfavorable | unfavorable | strongly_unfavorable | unclear",
+    "rationale": {
+      "text": "A separate AI opinion assessing whether the measure is likely favorable or unfavorable for this topic, based only on these excerpts. Explain the reasoning without presenting it as fact.",
+      "sourceQuote": "An exact, contiguous quote copied from the legal excerpts that supports this reasoning."
+    },
+    "pointsInFavor": [{"text": "A concise reason supported by the excerpts.", "sourceQuote": "An exact quote supporting this point."}],
+    "pointsAgainst": [{"text": "A concise concern supported by the excerpts.", "sourceQuote": "An exact quote supporting this point."}],
+    "uncertainties": ["Important uncertainty or effect not stated in the excerpts, or an empty array."]
+  }
+}
+
+Choose exactly one leaning. Use "mixed" when meaningful benefits and harms are balanced, and "unclear" when the excerpts do not support a defensible direction. Favorable means likely beneficial to the named issue; unfavorable means likely harmful to it. Assess only the effect on "${topic.label}", not whether the measure is good overall. Keep the factual summary and opinion separate. Do not add outside facts. Do not treat keyword frequency as evidence of impact. Do not invent benefits or harms when the legal text does not support them. Every factual summary sentence, rationale, and listed point must include a short exact quote from the provided legal excerpts. Copy sourceQuote verbatim, preserving wording and punctuation; do not paraphrase or combine separate excerpts. Use empty arrays for points or uncertainties when appropriate. If the text is not directly related, say so and use "unclear".\n\n${excerpts
       .map((excerpt, index) => `Excerpt ${index + 1}:\n${excerpt}`)
       .join('\n\n')}`;
 
     globalThis.prog02OpenRouter
       .askModel(prompt)
       .then((response) => {
-        const text = getModelText(response);
-        if (!text) throw new Error('The model returned an empty explanation. Please try again.');
-        if (current) setResult({ status: 'success', text });
+        const explanation = parseTopicExplanation(response.choices?.[0]?.message?.content);
+        if (current) setResult({ status: 'success', explanation, text: '' });
       })
       .catch((error) => {
         if (current) setResult({ status: 'error', text: error.message });
@@ -64,12 +85,31 @@ export default function IssueExplanation({ measure, sourceText, topic }) {
         </div>
       ) : (
         <>
-          <p className="whitespace-pre-wrap py-5 leading-relaxed">{result.text}</p>
+          {result.status === 'success' ? (
+            <>
+              <section className="pt-5">
+                <h4 className="font-sans text-sm font-semibold italic uppercase tracking-wide">
+                  What the text says
+                </h4>
+                <div className="space-y-3 pt-2 leading-relaxed">
+                  {result.explanation.textSays.map((sentence, index) => (
+                    <p key={`${sentence.text}-${index}`}>
+                      {sentence.text}
+                      <SourceCitation sourceText={sourceText} quote={sentence.sourceQuote} />
+                    </p>
+                  ))}
+                </div>
+              </section>
+              <TopicOpinion opinion={result.explanation.opinion} sourceText={sourceText} />
+            </>
+          ) : (
+            <p className="whitespace-pre-wrap py-5 leading-relaxed">{result.text}</p>
+          )}
           {result.status === 'success' && (
             <button
               type="button"
               onClick={() => setAttempt((value) => value + 1)}
-              className="mb-4 bg-[#d9d9d9] px-4 py-2 hover:bg-[#c9c9c9] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
+              className="mt-4 bg-[#d9d9d9] px-4 py-2 hover:bg-[#c9c9c9] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
             >
               Generate again
             </button>

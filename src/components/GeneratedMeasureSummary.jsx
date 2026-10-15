@@ -27,7 +27,12 @@ function wordCountStatus(wordCount, target) {
   return 'Within target';
 }
 
-export default function GeneratedMeasureSummary({ measure, result }) {
+export default function GeneratedMeasureSummary({
+  measure,
+  result,
+  onRetryQualifierCheck,
+  isRetryingQualifierCheck,
+}) {
   const gradeTarget = levelTargets[result.readingLevel];
   const lengthTarget = lengthTargets[result.length];
 
@@ -56,7 +61,15 @@ export default function GeneratedMeasureSummary({ measure, result }) {
           Target: {gradeTarget.label}
           <br />
           Actual: {result.reading.grade ?? 'Not available'}
-          {result.reading.grade !== null ? ` — ${gradeStatus(result.reading.grade, gradeTarget)}` : ''}
+          {result.reading.grade !== null
+            ? ` — ${result.readingTargetMet ? gradeStatus(result.reading.grade, gradeTarget) : `Outside target after ${result.readingAttempts} attempts`}`
+            : ''}
+          {result.readingAttempts > 1 && (
+            <>
+              <br />
+              Checked {result.readingAttempts} rewrites
+            </>
+          )}
         </p>
         <p>
           <span className="block font-semibold">Word count</span>
@@ -77,9 +90,21 @@ export default function GeneratedMeasureSummary({ measure, result }) {
       </div>
 
       <p className="mb-2 text-sm italic">AI-generated wording. Compare it with the original legal text.</p>
-      <div className="max-h-[42rem] overflow-y-auto whitespace-pre-wrap font-sans text-[clamp(0.95rem,1.25vw,1.125rem)] leading-relaxed">
-        {result.text}
+      <div className="max-h-[42rem] space-y-3 overflow-y-auto font-sans text-[clamp(0.95rem,1.25vw,1.125rem)] leading-relaxed">
+        {result.sentences.map((sentence, index) => (
+          <p key={`${sentence.text}-${index}`}>
+            {sentence.text}
+            <SourceCitation sourceText={result.sourceText} quote={sentence.sourceQuote} />
+          </p>
+        ))}
       </div>
+      <QualifierCheck
+        audit={result.qualifierAudit}
+        onRetry={onRetryQualifierCheck}
+        isRetrying={isRetryingQualifierCheck}
+      />
     </section>
   );
 }
+import QualifierCheck from './QualifierCheck.jsx';
+import SourceCitation from './SourceCitation.jsx';

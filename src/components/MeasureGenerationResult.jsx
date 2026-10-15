@@ -4,7 +4,8 @@ import IssueExplanation from './IssueExplanation.jsx';
 import TopicProgressBar from './TopicProgressBar.jsx';
 
 function IssueImpactSection({ topics, onExplain, selectedTopic }) {
-  const maxCount = Math.max(0, ...topics.map((topic) => topic.count));
+  const sortedTopics = [...topics].sort((left, right) => right.count - left.count);
+  const maxCount = Math.max(0, ...sortedTopics.map((topic) => topic.count));
 
   return (
     <section className="bg-[#d9d9d9] p-[clamp(16px,2vw,28px)]">
@@ -15,7 +16,7 @@ function IssueImpactSection({ topics, onExplain, selectedTopic }) {
       </p>
 
       <div className="space-y-3">
-        {topics.map((topic) => (
+        {sortedTopics.map((topic) => (
           <article key={topic.id} className="bg-[#dfaaaa] p-[clamp(14px,1.7vw,22px)]">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
@@ -54,12 +55,22 @@ function IssueImpactSection({ topics, onExplain, selectedTopic }) {
   );
 }
 
-export default function MeasureGenerationResult({ measure, result }) {
+export default function MeasureGenerationResult({
+  measure,
+  result,
+  onRetryQualifierCheck,
+  isRetryingQualifierCheck,
+}) {
   const [selectedTopic, setSelectedTopic] = useState(null);
 
   return (
     <div className="mt-3 space-y-5">
-      <GeneratedMeasureSummary measure={measure} result={result} />
+      <GeneratedMeasureSummary
+        measure={measure}
+        result={result}
+        onRetryQualifierCheck={onRetryQualifierCheck}
+        isRetryingQualifierCheck={isRetryingQualifierCheck}
+      />
       <div className="grid items-start gap-5 min-[1000px]:grid-cols-[1.23fr_1fr]">
         <IssueImpactSection
           topics={result.topics}
