@@ -14,7 +14,9 @@ ${context || 'No additional context supplied.'}
 Use these headings:
 WHAT IT DECIDES
 WHAT IT DOES NOT CONTROL
-WHY IT MATTERS`;
+WHY IT MATTERS
+
+Format the response as standard Markdown: use ## before each heading, bullet lists for individual decisions or limits, and **bold** short labels at the start of list items. Do not return HTML or wrap the answer in a code block.`;
 }
 
 export function buildOfficeImagePrompt(office) {

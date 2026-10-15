@@ -1,4 +1,5 @@
 import PromptDisclosure from './PromptDisclosure.jsx';
+import OfficeMarkdown from './OfficeMarkdown.jsx';
 
 function ExplanationResult({ office, result, costLabel }) {
   if (result.status === 'idle') return null;
@@ -18,9 +19,7 @@ function ExplanationResult({ office, result, costLabel }) {
             <h3 className="font-sans text-[clamp(1.1rem,1.67vw,1.5rem)]">AI Response</h3>
             <p className="font-sans text-xs">Explainer: {office.name}</p>
           </header>
-          <div className="whitespace-pre-wrap py-4 font-sans text-sm leading-[1.4]">
-            {result.content}
-          </div>
+          <OfficeMarkdown content={result.content} />
           <footer className="border-t border-black/50 pt-3 font-sans text-xs leading-relaxed">
             Written by google/gemini-2.5-flash-lite. Nothing is official; information presented can
             be wrong. Please fact check important information.
