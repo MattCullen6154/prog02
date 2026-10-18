@@ -4,8 +4,6 @@
 // and a different model. The image comes back as base64 text, which the page turns into an <img>.
 // Each image costs about $0.04, much more than a text call.
 
-const IMAGE_MODEL = 'google/gemini-2.5-flash-image';
-
 // ---- 1. The prompts. Try changing them! -------------------------------------
 // Two ways to ask for the same scene: a short sentence, and a detailed photographic style.
 const PROMPTS = {
@@ -40,30 +38,20 @@ document.getElementById('run').onclick = async () => {
   button.disabled = true;
   output.textContent = 'Drawing… (this can take 10–20 seconds)';
   try {
-    const response = await fetch('https://openrouter.ai/api/v1/images', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + OPENROUTER_API_KEY,
-      },
-      body: JSON.stringify({
-        model: IMAGE_MODEL,
-        prompt: prompt,
-        n: 1,                 // how many images
-        aspect_ratio: '3:2',  // landscape
-      }),
-    });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error?.message || response.statusText);
+    const imageResult = await prog02OpenRouter.generateImage(prompt);
+    const data = imageResult.raw;
 
     // The image is in data.data[0].b64_json: the picture's bytes written out as text (base64)
     const image = data.data[0];
     const img = document.createElement('img');
-    img.src = `data:${image.media_type || 'image/png'};base64,${image.b64_json}`;
+    img.src = imageResult.src;
     img.alt = prompt;
     output.replaceChildren(img);
 
-    document.getElementById('cost').textContent = 'Cost of this call: $' + data.usage.cost;
+    document.getElementById('cost').textContent =
+      typeof imageResult.cost === 'number'
+        ? 'Cost of this call: $' + imageResult.cost
+        : 'Cost of this call was not reported.';
 
     // Show the JSON, but shorten the base64 image text: it is hundreds of thousands of characters
     image.b64_json = image.b64_json.slice(0, 80) + '… (shortened)';

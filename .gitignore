@@ -2,3 +2,5 @@
 tools/.cache/
 js/config.local.js
 .env
+node_modules/
+dist/
