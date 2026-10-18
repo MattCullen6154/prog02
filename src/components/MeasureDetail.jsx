@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import GenerationPreview from './GenerationPreview.jsx';
 import MeasureGenerationResult from './MeasureGenerationResult.jsx';
+import PromptDisclosure from './PromptDisclosure.jsx';
 import ReadingLevelSelector from './ReadingLevelSelector.jsx';
 import { loadMeasureText } from '../utils/measureText.js';
 import { buildQualifierAuditPrompt, parseQualifierAudit } from '../utils/qualifierAudit.js';
@@ -78,6 +79,9 @@ export default function MeasureDetail({ measure, onClose }) {
   const [generationProgress, setGenerationProgress] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [isRetryingQualifierCheck, setIsRetryingQualifierCheck] = useState(false);
+  const [showRewritePrompt, setShowRewritePrompt] = useState(false);
+  const [rewritePrompt, setRewritePrompt] = useState('');
+  const [isLoadingRewritePrompt, setIsLoadingRewritePrompt] = useState(false);
   const activeResult =
     generatedResult?.readingLevel === readingLevel && generatedResult?.length === length
       ? generatedResult
@@ -92,6 +96,7 @@ export default function MeasureDetail({ measure, onClose }) {
     try {
       const fullText = await loadMeasureText(measure.id);
       const operativeSource = operativeText(fullText);
+      setRewritePrompt(buildRewritePrompt(measure, fullText, readingLevel, length, null));
       const target = readingTargets[readingLevel];
       let previous = null;
       let best = null;
@@ -104,9 +109,9 @@ export default function MeasureDetail({ measure, onClose }) {
         setGenerationProgress(
           `Generating and checking reading level (attempt ${attempt} of ${MAX_REWRITE_ATTEMPTS})…`,
         );
-        const response = await globalThis.prog02OpenRouter.askModel(
-          buildRewritePrompt(measure, fullText, readingLevel, length, previous),
-        );
+        const prompt = buildRewritePrompt(measure, fullText, readingLevel, length, previous);
+        setRewritePrompt(prompt);
+        const response = await globalThis.prog02OpenRouter.askModel(prompt);
         const sentences = parseCitedSummary(response.choices?.[0]?.message?.content);
         const text = sentences.map((sentence) => sentence.text).join(' ');
         if (!text) throw new Error('The model returned an empty rewrite.');
@@ -170,6 +175,28 @@ export default function MeasureDetail({ measure, onClose }) {
     } finally {
       setIsGenerating(false);
       setGenerationProgress('');
+    }
+  }
+
+  async function toggleRewritePrompt() {
+    if (showRewritePrompt) {
+      setShowRewritePrompt(false);
+      return;
+    }
+
+    setShowRewritePrompt(true);
+    if (rewritePrompt || isLoadingRewritePrompt) return;
+
+    setIsLoadingRewritePrompt(true);
+    try {
+      const fullText = await loadMeasureText(measure.id);
+      setRewritePrompt(buildRewritePrompt(measure, fullText, readingLevel, length, null));
+    } catch (error) {
+      setRewritePrompt(
+        `Could not load the prompt: ${error instanceof Error ? error.message : String(error)}`,
+      );
+    } finally {
+      setIsLoadingRewritePrompt(false);
     }
   }
 
@@ -249,11 +276,15 @@ export default function MeasureDetail({ measure, onClose }) {
         onReadingLevelChange={(value) => {
           setReadingLevel(value);
           setGenerationError('');
+          setRewritePrompt('');
+          setShowRewritePrompt(false);
         }}
         length={length}
         onLengthChange={(value) => {
           setLength(value);
           setGenerationError('');
+          setRewritePrompt('');
+          setShowRewritePrompt(false);
         }}
         disabled={isGenerating || isRetryingQualifierCheck}
       />
@@ -277,6 +308,11 @@ export default function MeasureDetail({ measure, onClose }) {
           generationProgress={generationProgress}
           hasGenerated={activeResult !== null}
           error={generationError}
+        />
+        <PromptDisclosure
+          prompt={isLoadingRewritePrompt ? 'Loading the measure text for the prompt…' : rewritePrompt}
+          open={showRewritePrompt}
+          onToggle={toggleRewritePrompt}
         />
       </div>
       {activeResult && (

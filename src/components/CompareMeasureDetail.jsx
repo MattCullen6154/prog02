@@ -4,12 +4,13 @@ import ArgumentAnalysis from './ArgumentAnalysis.jsx';
 import ArgumentOverview from './ArgumentOverview.jsx';
 import CompareMeasureHeader from './CompareMeasureHeader.jsx';
 import SignerSection from './SignerSection.jsx';
-import { summarizeArguments } from './argumentSummaries.js';
+import { buildArgumentSummaryPrompt, summarizeArguments } from './argumentSummaries.js';
 
 export default function CompareMeasureDetail({ measure, onClose }) {
   const [generation, setGeneration] = useState({ status: 'loading' });
   const [retryCount, setRetryCount] = useState(0);
   const argumentsList = Object.values(measure.arguments);
+  const summaryPrompt = buildArgumentSummaryPrompt(measure);
 
   useEffect(() => {
     let isCurrent = true;
@@ -46,6 +47,7 @@ export default function CompareMeasureDetail({ measure, onClose }) {
         status={generation.status}
         error={generation.status === 'error' ? generation.message : null}
         onRetry={() => setRetryCount((count) => count + 1)}
+        prompt={summaryPrompt}
       />
     </main>
   );

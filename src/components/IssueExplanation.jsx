@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
 import { getTopicEvidence } from '../utils/topicKeywords.js';
 import { parseTopicExplanation } from '../utils/topicExplanation.js';
+import PromptDisclosure from './PromptDisclosure.jsx';
 import SourceCitation from './SourceCitation.jsx';
 import TopicOpinion from './TopicOpinion.jsx';
 
 export default function IssueExplanation({ measure, sourceText, topic }) {
   const [attempt, setAttempt] = useState(0);
+  const [showPrompt, setShowPrompt] = useState(false);
+  const [promptText, setPromptText] = useState('');
   const [result, setResult] = useState({ status: 'loading', explanation: null, text: '' });
 
   useEffect(() => {
@@ -46,6 +49,7 @@ export default function IssueExplanation({ measure, sourceText, topic }) {
 Choose exactly one leaning. Use "mixed" when meaningful benefits and harms are balanced, and "unclear" when the excerpts do not support a defensible direction. Favorable means likely beneficial to the named issue; unfavorable means likely harmful to it. Assess only the effect on "${topic.label}", not whether the measure is good overall. Keep the factual summary and opinion separate. Do not add outside facts. Do not treat keyword frequency as evidence of impact. Do not invent benefits or harms when the legal text does not support them. Every factual summary sentence, rationale, and listed point must include a short exact quote from the provided legal excerpts. Copy sourceQuote verbatim, preserving wording and punctuation; do not paraphrase or combine separate excerpts. Use empty arrays for points or uncertainties when appropriate. If the text is not directly related, say so and use "unclear".\n\n${excerpts
       .map((excerpt, index) => `Excerpt ${index + 1}:\n${excerpt}`)
       .join('\n\n')}`;
+    setPromptText(prompt);
 
     globalThis.prog02OpenRouter
       .askModel(prompt)
@@ -70,6 +74,13 @@ Choose exactly one leaning. Use "mixed" when meaningful benefits and harms are b
           {result.status === 'empty' ? 'Keyword check' : 'AI-generated explanation'}
         </span>
       </div>
+      {promptText && (
+        <PromptDisclosure
+          prompt={promptText}
+          open={showPrompt}
+          onToggle={() => setShowPrompt((open) => !open)}
+        />
+      )}
       {result.status === 'loading' ? (
         <p className="py-5">Generating a focused explanation…</p>
       ) : result.status === 'error' ? (

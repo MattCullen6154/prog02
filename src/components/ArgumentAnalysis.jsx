@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import ArgumentCard from './ArgumentCard.jsx';
+import PromptDisclosure from './PromptDisclosure.jsx';
 
 function getSortedArguments(argumentsData) {
   return Object.entries(argumentsData)
@@ -10,8 +12,9 @@ function getSortedArguments(argumentsData) {
     });
 }
 
-export default function ArgumentAnalysis({ measure, summaries, status, error, onRetry }) {
+export default function ArgumentAnalysis({ measure, summaries, status, error, onRetry, prompt }) {
   const argumentsList = getSortedArguments(measure.arguments);
+  const [showPrompt, setShowPrompt] = useState(false);
 
   return (
     <section className="bg-[#d9d9d9] p-[clamp(18px,1.75vw,25px)]">
@@ -26,6 +29,11 @@ export default function ArgumentAnalysis({ measure, summaries, status, error, on
       <div className="mt-3">
         <TypeLabel>On both sides</TypeLabel>
       </div>
+      <PromptDisclosure
+        prompt={prompt}
+        open={showPrompt}
+        onToggle={() => setShowPrompt((open) => !open)}
+      />
       {status === 'loading' && (
         <p role="status" className="mt-3 font-sans text-sm">
           Generating neutral summaries of the printed arguments…

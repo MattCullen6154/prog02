@@ -33,10 +33,7 @@ function parseSummaryResponse(content, argumentKeys) {
   return summaries;
 }
 
-export function summarizeArguments(measure) {
-  const existingRequest = summaryRequests.get(measure.id);
-  if (existingRequest) return existingRequest;
-
+export function buildArgumentSummaryPrompt(measure) {
   const entries = Object.entries(measure.arguments);
   const input = entries
     .map(([key, argument]) => `${key} — ${argument.heading}\n${argument.text}`)
@@ -44,6 +41,15 @@ export function summarizeArguments(measure) {
   const prompt = `Summarize each of the following official ballot argument documents in 1–2 concise, neutral sentences. Preserve the author's position and main claim, attribute disputed claims to the document, and do not add facts. Return only a JSON object whose keys are exactly these document keys and whose values are the summaries:\n${entries
     .map(([key]) => key)
     .join(', ')}\n\n${input}`;
+  return prompt;
+}
+
+export function summarizeArguments(measure) {
+  const existingRequest = summaryRequests.get(measure.id);
+  if (existingRequest) return existingRequest;
+
+  const entries = Object.entries(measure.arguments);
+  const prompt = buildArgumentSummaryPrompt(measure);
 
   const request = globalThis.prog02OpenRouter
     .askModel(prompt)

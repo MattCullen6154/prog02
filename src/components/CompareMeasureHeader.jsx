@@ -10,7 +10,7 @@ export default function CompareMeasureHeader({ measure, onClose }) {
         ×
       </button>
       <div className="min-w-0">
-        <h1 className="font-sans text-[clamp(1.7rem,2.5vw,2.25rem)] font-semibold leading-tight">
+        <h1 className="font-serif text-[clamp(1.7rem,2.5vw,2.25rem)] font-semibold leading-tight">
           {measure.label}
         </h1>
         <p className="mt-2 font-sans text-[clamp(0.75rem,1.11vw,1rem)] leading-[1.4]">
