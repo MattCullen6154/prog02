@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Election '26</title>
+  <link rel="stylesheet" href="style.css?v=topic-shares">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="masthead">
+      <!--<p class="eyebrow">The most important</p> -->
+      <h1>Election <span>'26</span></h1>
+      <!--<p class="tagline">of our lives!</p>-->
+    </header>
+
+    <div class="layout">
+      <aside class="sidebar" aria-label="Guide sections">
+        <button class="nav-link active" type="button" data-view="summarize">Summarize</button>
+        <button class="nav-link" type="button" data-view="topics">Topics of concern</button>
+        <button class="nav-link" type="button" data-view="compare">Compare sides</button>
+        <button class="nav-link" type="button" data-view="offices">Offices</button>
+      </aside>
+
+      <main class="content">
+        <section class="control-strip" aria-label="Shared ballot controls">
+          <label>
+            <span>Ballot measure</span>
+            <select id="measureSelect"></select>
+          </label>
+          <div class="cost-meter" aria-live="polite">
+            <span>Session cost</span>
+            <strong id="sessionCost">$0.0000</strong>
+          </div>
+        </section>
+
+        <section id="summarize" class="view active" aria-labelledby="summarizeTitle">
+          <div class="section-heading">
+            <div>
+              <p class="kicker">Measures</p>
+              <h2 id="summarizeTitle">Make the legal text readable</h2>
+            </div>
+            <a id="legalTextLink" class="source-link" target="_blank" rel="noreferrer">Full legal text</a>
+          </div>
+
+          <div class="tool-row">
+            <label>
+              <span>Reading level</span>
+              <select id="readingSelect">
+                <option value="as-written">As written</option>
+                <option value="plain">Plain English</option>
+                <option value="everyday">Everyday</option>
+                <option value="simplest">Simplest</option>
+              </select>
+            </label>
+            <label>
+              <span>Length</span>
+              <select id="lengthSelect">
+                <option value="headline">Headline</option>
+                <option value="short">Short</option>
+                <option value="standard" selected>Standard</option>
+                <option value="complete">Complete</option>
+              </select>
+            </label>
+            <button id="renderMeasure" class="primary-action" type="button">Convert</button>
+          </div>
+
+          <p id="renderWarning" class="warning" hidden></p>
+
+          <div class="stat-grid" id="measureStats"></div>
+
+          <article class="chalk-panel large-output">
+            <div class="panel-label">
+              <span id="renderLabel">Certified text</span>
+              <span id="renderSource">Source: full legal text</span>
+            </div>
+            <div id="renderOutput" class="generated-output">Choose a measure and press Render.</div>
+          </article>
+
+          <details class="source-drawer">
+            <summary>Official summary comparison source</summary>
+            <p id="officialSummary"></p>
+          </details>
+        </section>
+
+        <section id="topics" class="view" aria-labelledby="topicsTitle">
+          <div class="section-heading">
+            <div>
+              <p class="kicker">Topics of concern</p>
+              <h2 id="topicsTitle">Where the measure touches everyday life</h2>
+            </div>
+            <button id="explainTopic" class="primary-action" type="button">Explain selected topic</button>
+          </div>
+
+          <div id="topicBars" class="topic-grid" aria-live="polite"></div>
+
+          <article class="chalk-panel">
+            <div class="panel-label">
+              <span>AI-generated topic explanation</span>
+              <span>Source: selected measure legal text</span>
+            </div>
+            <div id="topicOutput" class="generated-output">Select a topic card, then ask for an explanation.</div>
+          </article>
+        </section>
+
+        <section id="compare" class="view" aria-labelledby="compareTitle">
+          <div class="section-heading">
+            <div>
+              <p class="kicker">Argument comparison</p>
+              <h2 id="compareTitle">Show what each side claims</h2>
+            </div>
+            <button id="extractClaims" class="primary-action" type="button">Extract claims</button>
+          </div>
+
+          <p class="disclaimer" id="argumentDisclaimer"></p>
+
+          <div id="signerSummary" class="signer-grid"></div>
+
+          <article class="chalk-panel">
+            <div class="panel-label">
+              <span>AI-generated structured extraction</span>
+              <span>Source: official arguments and rebuttals</span>
+            </div>
+            <div id="claimsOutput" class="generated-output">Press Extract claims to build a side-by-side comparison.</div>
+          </article>
+        </section>
+
+        <section id="offices" class="view" aria-labelledby="officesTitle">
+          <div class="section-heading">
+            <div>
+              <p class="kicker">Down-ballot offices</p>
+              <h2 id="officesTitle">What does this office actually control?</h2>
+            </div>
+            <label class="office-picker">
+              <span>Office</span>
+              <select id="officeSelect"></select>
+            </label>
+          </div>
+
+          <div class="tool-row">
+            <button id="explainOffice" class="primary-action" type="button">Explain office</button>
+            <label>
+              <span>Image style</span>
+              <select id="imageStyleSelect">
+                <option value="photorealistic" selected>Photorealistic</option>
+                <option value="bosch">Bosch-esque</option>
+                <option value="cartoon">Cartoon</option>
+                <option value="pixar">Pixar style</option>
+              </select>
+            </label>
+            <button id="generateImage" class="secondary-action" type="button">Generate illustration</button>
+          </div>
+
+          <div class="office-grid">
+            <article class="chalk-panel">
+              <div class="panel-label">
+                <span>AI-generated office explainer</span>
+                <span>Source: office description from data pack</span>
+              </div>
+              <div id="officeOutput" class="generated-output">Choose an office and ask for an explanation.</div>
+            </article>
+
+            <article class="chalk-panel">
+              <div class="panel-label">
+                <span>AI-generated illustration</span>
+                <span>No real people or official election material</span>
+              </div>
+              <div id="imageOutput" class="image-output">Generate one image after the prompt feels settled.</div>
+            </article>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script src="js/config.local.js"></script>
+  <script src="js/openrouter.js"></script>
+  <script src="js/fk.js"></script>
+  <script src="script.js?v=topic-shares"></script>
+</body>
+</html>
